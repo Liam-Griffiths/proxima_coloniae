@@ -1,5 +1,5 @@
 use sqlx::PgPool;
-use crate::models::galaxy::{Galaxy, StarSystem, CelestialBody};
+use crate::models::galaxy::{Galaxy, StarSystem, CelestialBody, CelestialBodyType};
 
 pub struct GalaxyService {
     pool: PgPool,
@@ -19,7 +19,7 @@ impl GalaxyService {
 
         if let Some(row) = existing_galaxy {
             Ok(Galaxy {
-                id: Some(row.id),
+                id: row.id,
                 name: row.name,
             })
         } else {
@@ -37,7 +37,7 @@ impl GalaxyService {
         .await?;
 
         Ok(Galaxy {
-            id: Some(galaxy.id),
+            id: galaxy.id,
             name: galaxy.name,
         })
     }
@@ -50,14 +50,14 @@ impl GalaxyService {
         .await?;
 
         Ok(Galaxy {
-            id: Some(galaxy.id),
+            id: galaxy.id,
             name: galaxy.name,
         })
     }
 
     pub async fn get_star_systems(&self) -> Result<Vec<StarSystem>, sqlx::Error> {
         let systems = sqlx::query!(
-            "SELECT id, galaxy_id, name, x, y, z FROM star_systems"
+            "SELECT id, galaxy_id as \"galaxy_id!: i32\", name, x, y, z FROM star_systems"
         )
         .fetch_all(&self.pool)
         .await?;
@@ -65,7 +65,7 @@ impl GalaxyService {
         Ok(systems
             .into_iter()
             .map(|row| StarSystem {
-                id: Some(row.id),
+                id: row.id,
                 galaxy_id: row.galaxy_id,
                 name: row.name,
                 x: row.x,
@@ -79,7 +79,7 @@ impl GalaxyService {
         let bodies = sqlx::query!(
             r#"
             SELECT
-                id, system_id, name,
+                id, system_id as "system_id!: i32", name,
                 body_type as "body_type!: CelestialBodyType",
                 orbit_distance, size, mass, temperature, atmosphere
             FROM celestial_bodies
@@ -93,7 +93,7 @@ impl GalaxyService {
         Ok(bodies
             .into_iter()
             .map(|row| CelestialBody {
-                id: Some(row.id),
+                id: row.id,
                 system_id: row.system_id,
                 name: row.name,
                 body_type: row.body_type,
@@ -105,4 +105,5 @@ impl GalaxyService {
             })
             .collect())
     }
+
 }

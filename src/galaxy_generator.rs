@@ -2,15 +2,15 @@ use crate::models::galaxy::{Galaxy, StarSystem, CelestialBody, CelestialBodyType
 use rand::Rng;
 
 pub fn generate_galaxy(name: String) -> (Galaxy, Vec<StarSystem>, Vec<CelestialBody>, Vec<CelestialBodyResource>) {
-    let galaxy = Galaxy { id: Some(1), name };
+    let galaxy = Galaxy { id: 1, name };
     let mut systems = Vec::new();
     let mut bodies = Vec::new();
     let mut body_resources = Vec::new();
 
     // Create central system
     systems.push(StarSystem {
-        id: Some(1),
-        galaxy_id: galaxy.id.unwrap(),
+        id: 1,
+        galaxy_id: galaxy.id,
         name: "Central System".to_string(),
         x: 0.0,
         y: 0.0,
@@ -22,8 +22,8 @@ pub fn generate_galaxy(name: String) -> (Galaxy, Vec<StarSystem>, Vec<CelestialB
     for i in 1..10 {
         let (x, y, z) = generate_sphere_point(&mut rng);
         systems.push(StarSystem {
-            id: Some(i + 1),
-            galaxy_id: galaxy.id.unwrap(),
+            id: i + 1,
+            galaxy_id: galaxy.id,
             name: format!("System {}", i + 1),
             x, y, z,
         });
@@ -33,7 +33,7 @@ pub fn generate_galaxy(name: String) -> (Galaxy, Vec<StarSystem>, Vec<CelestialB
     for system in &systems {
         let num_bodies = rng.gen_range(3..8);
         for j in 0..num_bodies {
-            let body = generate_celestial_body(system.id.unwrap(), j + 1, &mut rng);
+            let body = generate_celestial_body(system.id, j + 1, &mut rng);
             bodies.push(body);
         }
     }
@@ -43,7 +43,7 @@ pub fn generate_galaxy(name: String) -> (Galaxy, Vec<StarSystem>, Vec<CelestialB
         let num_resources = rng.gen_range(1..5);
         for _ in 0..num_resources {
             body_resources.push(CelestialBodyResource {
-                body_id: body.id.unwrap(),
+                body_id: body.id,
                 resource_id: rng.gen_range(1..11),  // Assuming 10 different resources
                 abundance: rng.gen_range(0.0..1.0),
             });
@@ -55,7 +55,7 @@ pub fn generate_galaxy(name: String) -> (Galaxy, Vec<StarSystem>, Vec<CelestialB
 
 fn generate_celestial_body(system_id: i32, body_number: i32, rng: &mut impl Rng) -> CelestialBody {
     CelestialBody {
-        id: Some(body_number),
+        id: body_number,
         system_id,
         name: format!("Body {}", body_number),
         body_type: match rng.gen_range(0..10) {

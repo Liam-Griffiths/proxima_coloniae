@@ -3,13 +3,13 @@ use sqlx::FromRow;
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Galaxy {
-    pub id: Option<i32>,
+    pub id: i32,
     pub name: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct StarSystem {
-    pub id: Option<i32>,
+    pub id: i32,
     pub galaxy_id: i32,
     pub name: String,
     pub x: f64,
@@ -27,8 +27,8 @@ pub enum CelestialBodyType {
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct CelestialBody {
-    pub id: Option<i32>,
-    pub system_id: i32,
+    pub id: i32,
+    pub system_id: i32, // Changed to i32
     pub name: String,
     pub body_type: CelestialBodyType,
     pub orbit_distance: f64,
