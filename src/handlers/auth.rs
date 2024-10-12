@@ -1,4 +1,4 @@
-use actix_web::{web, HttpResponse, Responder, Error, HttpRequest};
+use actix_web::{web, HttpResponse, Error, HttpRequest};
 use sqlx::PgPool;
 use bcrypt::{hash, verify, DEFAULT_COST};
 use crate::models::user::{CreateUser, LoginUser, User};
