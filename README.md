@@ -1,6 +1,14 @@
 # Proxima Coloniae
 
-Proxima Coloniae is a web-based space strategy game where players can explore nearby star systems, colonize planets, manage resources, build fleets, and engage in interstellar warfare.
+Proxima Coloniae is a web-based space strategy game.
+
+## Why?
+
+This is a silly hobby project. As a kid i had enormous fun playing text based browser mmo's. The popularity of this genre of game has declined over the years, but these games will always have a special place in my heart. 
+
+The impetus for me learning programming was my desire to create my own text based games, which lead me to learning PHP (i know, i know), and writing my first spaghetti code project, a space browser game.
+
+In a similar vein i'm creating something my past self would've loved, and learning some Rust whilst i'm at it.
 
 ## Technologies Used
 
@@ -8,15 +16,7 @@ Proxima Coloniae is a web-based space strategy game where players can explore ne
 - Frontend: React + Tailwind + Vite
 - Database: PostgreSQL
 
-## Getting Started
-
-1. Clone the repository
-2. Set up the Rust environment and PostgreSQL database
-3. Configure the .env file with your database URL
-4. Run the backend server
-5. Open the frontend in a web browser
-
-## Features
+## Eventual Features
 
 - User registration and authentication
 - Galaxy exploration and planet colonization
@@ -24,11 +24,13 @@ Proxima Coloniae is a web-based space strategy game where players can explore ne
 - Ship building and fleet management
 - Player-vs-player combat
 - Research and technology progression
+- AI players
+- Trade
 
 ## Contributing
 
-Please read CONTRIBUTING.md for details on our code of conduct and the process for submitting pull requests.
+Just ask.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE.md file for details.
+This project is the intellectual property of the Author.
