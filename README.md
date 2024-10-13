@@ -5,7 +5,7 @@ Proxima Coloniae is a web-based space strategy game where players can explore ne
 ## Technologies Used
 
 - Backend: Rust with Actix-web
-- Frontend: HTML, CSS (Tailwind), and HTMX
+- Frontend: React + Tailwind + Vite
 - Database: PostgreSQL
 
 ## Getting Started

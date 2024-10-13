@@ -1,5 +1,6 @@
 use serde::{Serialize, Deserialize};
 use sqlx::FromRow;
+use sqlx::Type;
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Galaxy {
@@ -15,6 +16,21 @@ pub struct StarSystem {
     pub x: f64,
     pub y: f64,
     pub z: f64,
+    pub star_type: StarType,
+    pub star_mass: f64,
+    pub star_radius: f64,
+    pub star_temperature: f64,
+    pub star_luminosity: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Type)]
+#[sqlx(type_name = "star_type", rename_all = "snake_case")]
+pub enum StarType {
+    MainSequence,
+    RedGiant,
+    WhiteDwarf,
+    Neutron,
+    BlackHole,
 }
 
 #[derive(Debug, Serialize, Deserialize, sqlx::Type)]

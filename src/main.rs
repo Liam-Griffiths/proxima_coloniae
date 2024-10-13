@@ -31,7 +31,10 @@ async fn main() -> std::io::Result<()> {
     let galaxy_service = web::Data::new(GalaxyService::new(pool.clone()));
 
     // Initialize the galaxy
-    galaxy_service.initialize_galaxy().await.expect("Failed to initialize galaxy");
+    match galaxy_service.initialize_galaxy().await {
+        Ok(_) => println!("Galaxy initialized successfully"),
+        Err(e) => eprintln!("Failed to initialize galaxy: {}", e),
+    }
 
     HttpServer::new(move || {
         let cors = Cors::default()
@@ -49,7 +52,7 @@ async fn main() -> std::io::Result<()> {
             .service(web::resource("/galaxy").route(web::get().to(get_galaxy)))
             .service(web::resource("/systems").route(web::get().to(get_star_systems)))
             .service(web::resource("/system/{id}/bodies").route(web::get().to(get_celestial_bodies)))
-            .service(fs::Files::new("/", "./static").index_file("index.html"))
+            .service(fs::Files::new("/", "../proxima-coloniae/dist").index_file("index.html"))
     })
     .bind("127.0.0.1:8080")?
     .run()

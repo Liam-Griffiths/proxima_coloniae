@@ -1,5 +1,6 @@
 use sqlx::PgPool;
-use crate::models::galaxy::{Galaxy, StarSystem, CelestialBody, CelestialBodyType};
+use crate::models::galaxy::{Galaxy, StarSystem, StarType, CelestialBody, CelestialBodyType, CelestialBodyResource};
+use crate::galaxy_generator;
 
 pub struct GalaxyService {
     pool: PgPool,
@@ -23,31 +24,46 @@ impl GalaxyService {
                 name: row.name,
             })
         } else {
-            // Galaxy doesn't exist, create it
-            self.create_galaxy("Proxima Coloniae Galaxy".to_string()).await
+            self.generate_and_persist_galaxy("Proxima Coloniae Galaxy".to_string()).await
         }
     }
 
-    async fn create_galaxy(&self, name: String) -> Result<Galaxy, sqlx::Error> {
+    pub async fn generate_and_persist_galaxy(&self, name: String) -> Result<Galaxy, sqlx::Error> {
+        let (galaxy, systems, bodies, body_resources) = galaxy_generator::generate_galaxy(name);
+
+        // Start a transaction
+        let mut tx = self.pool.begin().await?;
+
+        // Insert galaxy
         let galaxy = sqlx::query!(
             "INSERT INTO galaxies (name) VALUES ($1) RETURNING id, name",
-            name
+            galaxy.name
         )
-        .fetch_one(&self.pool)
+        .fetch_one(&mut tx)
         .await?;
 
-        Ok(Galaxy {
-            id: galaxy.id,
-            name: galaxy.name,
-        })
-    }
+        // Insert star systems
+        for system in systems {
+            sqlx::query!(
+                "INSERT INTO star_systems (galaxy_id, name, x, y, z, star_type, star_mass, star_radius, star_temperature, star_luminosity)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+                galaxy.id,
+                system.name,
+                system.x,
+                system.y,
+                system.z,
+                system.star_type as StarType,
+                system.star_mass,
+                system.star_radius,
+                system.star_temperature,
+                system.star_luminosity
+            )
+            .execute(&mut tx)
+            .await?;
+        }
 
-    pub async fn get_galaxy(&self) -> Result<Galaxy, sqlx::Error> {
-        let galaxy = sqlx::query!(
-            "SELECT id, name FROM galaxies LIMIT 1"
-        )
-        .fetch_one(&self.pool)
-        .await?;
+        // Commit the transaction
+        tx.commit().await?;
 
         Ok(Galaxy {
             id: galaxy.id,
@@ -57,7 +73,21 @@ impl GalaxyService {
 
     pub async fn get_star_systems(&self) -> Result<Vec<StarSystem>, sqlx::Error> {
         let systems = sqlx::query!(
-            "SELECT id, galaxy_id as \"galaxy_id!: i32\", name, x, y, z FROM star_systems"
+            r#"
+            SELECT
+                id,
+                galaxy_id as "galaxy_id!: i32",
+                name,
+                x,
+                y,
+                z,
+                star_type as "star_type!: StarType",
+                star_mass,
+                star_radius,
+                star_temperature,
+                star_luminosity
+            FROM star_systems
+            "#
         )
         .fetch_all(&self.pool)
         .await?;
@@ -71,8 +101,26 @@ impl GalaxyService {
                 x: row.x,
                 y: row.y,
                 z: row.z,
+                star_type: row.star_type,
+                star_mass: row.star_mass,
+                star_radius: row.star_radius,
+                star_temperature: row.star_temperature,
+                star_luminosity: row.star_luminosity,
             })
             .collect())
+    }
+
+    pub async fn get_galaxy(&self) -> Result<Galaxy, sqlx::Error> {
+        let galaxy = sqlx::query!(
+            "SELECT id, name FROM galaxies LIMIT 1"
+        )
+        .fetch_one(&self.pool)
+        .await?;
+
+        Ok(Galaxy {
+            id: galaxy.id,
+            name: galaxy.name,
+        })
     }
 
     pub async fn get_celestial_bodies(&self, system_id: i32) -> Result<Vec<CelestialBody>, sqlx::Error> {

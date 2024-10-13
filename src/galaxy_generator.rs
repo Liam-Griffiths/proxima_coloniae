@@ -1,4 +1,4 @@
-use crate::models::galaxy::{Galaxy, StarSystem, CelestialBody, CelestialBodyType, CelestialBodyResource};
+use crate::models::galaxy::{Galaxy, StarSystem, StarType, CelestialBody, CelestialBodyType, CelestialBodyResource};
 use rand::Rng;
 
 pub fn generate_galaxy(name: String) -> (Galaxy, Vec<StarSystem>, Vec<CelestialBody>, Vec<CelestialBodyResource>) {
@@ -8,25 +8,13 @@ pub fn generate_galaxy(name: String) -> (Galaxy, Vec<StarSystem>, Vec<CelestialB
     let mut body_resources = Vec::new();
 
     // Create central system
-    systems.push(StarSystem {
-        id: 1,
-        galaxy_id: galaxy.id,
-        name: "Central System".to_string(),
-        x: 0.0,
-        y: 0.0,
-        z: 0.0,
-    });
+    systems.push(generate_star_system(1, galaxy.id, "Central System".to_string(), 0.0, 0.0, 0.0));
 
     // Generate other systems in a sphere
     let mut rng = rand::thread_rng();
     for i in 1..10 {
         let (x, y, z) = generate_sphere_point(&mut rng);
-        systems.push(StarSystem {
-            id: i + 1,
-            galaxy_id: galaxy.id,
-            name: format!("System {}", i + 1),
-            x, y, z,
-        });
+        systems.push(generate_star_system(i + 1, galaxy.id, format!("System {}", i + 1), x, y, z));
     }
 
     // Generate celestial bodies for each system
@@ -51,6 +39,37 @@ pub fn generate_galaxy(name: String) -> (Galaxy, Vec<StarSystem>, Vec<CelestialB
     }
 
     (galaxy, systems, bodies, body_resources)
+}
+
+fn generate_star_system(id: i32, galaxy_id: i32, name: String, x: f64, y: f64, z: f64) -> StarSystem {
+    let mut rng = rand::thread_rng();
+    let star_type = match rng.gen_range(0..100) {
+        0..=70 => StarType::MainSequence,
+        71..=85 => StarType::RedGiant,
+        86..=95 => StarType::WhiteDwarf,
+        96..=98 => StarType::Neutron,
+        _ => StarType::BlackHole,
+    };
+
+    let (mass, radius, temperature, luminosity) = match star_type {
+        StarType::MainSequence => (rng.gen_range(0.1..50.0), rng.gen_range(0.1..50.0), rng.gen_range(2000.0..30000.0), rng.gen_range(0.0001..1000000.0)),
+        StarType::RedGiant => (rng.gen_range(0.5..10.0), rng.gen_range(10.0..1000.0), rng.gen_range(3000.0..5000.0), rng.gen_range(100.0..10000.0)),
+        StarType::WhiteDwarf => (rng.gen_range(0.17..1.33), rng.gen_range(0.008..0.02), rng.gen_range(4000.0..40000.0), rng.gen_range(0.0001..0.1)),
+        StarType::Neutron => (rng.gen_range(1.4..3.0), rng.gen_range(1e-5..2e-5), rng.gen_range(1e5..1e6), rng.gen_range(0.1..1.0)),
+        StarType::BlackHole => (rng.gen_range(3.0..100.0), 0.0, 0.0, 0.0),
+    };
+
+    StarSystem {
+        id,
+        galaxy_id,
+        name,
+        x, y, z,
+        star_type,
+        star_mass: mass,
+        star_radius: radius,
+        star_temperature: temperature,
+        star_luminosity: luminosity,
+    }
 }
 
 fn generate_celestial_body(system_id: i32, body_number: i32, rng: &mut impl Rng) -> CelestialBody {

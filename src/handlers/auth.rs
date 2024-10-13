@@ -7,8 +7,9 @@ use chrono::Utc;
 
 pub async fn register(
     pool: web::Data<PgPool>,
-    form: web::Form<CreateUser>,
+    json: web::Json<CreateUser>,
 ) -> Result<HttpResponse, Error> {
+    let form = json.into_inner();
     let hashed_password = hash(&form.password, DEFAULT_COST).unwrap();
     let now = Utc::now();
 
@@ -37,8 +38,9 @@ pub async fn register(
 
 pub async fn login(
     pool: web::Data<PgPool>,
-    form: web::Form<LoginUser>,
+    json: web::Json<LoginUser>,
 ) -> Result<HttpResponse, Error> {
+    let form = json.into_inner();
     let result = sqlx::query_as!(
         User,
         "SELECT * FROM users WHERE email = $1",
