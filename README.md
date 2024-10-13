@@ -6,7 +6,7 @@ Proxima Coloniae is a web-based space strategy game.
 
 This is a silly hobby project. As a kid i had enormous fun playing text based browser mmo's. The popularity of this genre of game has declined over the years, but these games will always have a special place in my heart. 
 
-The impetus for me learning programming was my desire to create my own text based games, which lead me to learning PHP (i know, i know), and writing my first spaghetti code project, a space browser game.
+The impetus for me learning programming was my desire to create my own text based games, which led me to learning PHP (i know, i know), and writing my first spaghetti code project, a space browser game.
 
 In a similar vein i'm creating something my past self would've loved, and learning some Rust whilst i'm at it.
 
