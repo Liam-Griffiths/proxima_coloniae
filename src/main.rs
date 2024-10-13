@@ -52,7 +52,7 @@ async fn main() -> std::io::Result<()> {
             .service(web::resource("/galaxy").route(web::get().to(get_galaxy)))
             .service(web::resource("/systems").route(web::get().to(get_star_systems)))
             .service(web::resource("/system/{id}/bodies").route(web::get().to(get_celestial_bodies)))
-            .service(fs::Files::new("/", "../proxima-coloniae/dist").index_file("index.html"))
+            .service(fs::Files::new("/", "../frontend/dist").index_file("index.html"))
     })
     .bind("127.0.0.1:8080")?
     .run()
